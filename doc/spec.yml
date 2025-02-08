@@ -1,0 +1,139 @@
+openapi: 3.0.3
+info:
+  title: TransactionX
+  description: API for registering and consulting transactions with currency conversion.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+paths:
+  /transactions:
+    post:
+      summary: Register a new transaction
+      operationId: registerTransaction
+      tags:
+        - Transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionInput'
+      responses:
+        '201':
+          description: Transaction successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid request payload
+
+  /transactions/{id}:
+    get:
+      summary: Retrieve a transaction with currency conversion
+      operationId: getTransaction
+      tags:
+        - Transactions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique identifier of the transaction
+          schema:
+            type: string
+        - name: country
+          in: query
+          required: true
+          description: Country code to convert the currency
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction details with converted amount
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConvertedTransaction'
+        '404':
+          description: Transaction not found
+        '400':
+          description: No exchange rate available within 6 months of transaction date
+
+components:
+  schemas:
+    TransactionInput:
+      type: object
+      required:
+        - description
+        - transaction_date
+        - purchase_amount
+      properties:
+        description:
+          type: string
+          maxLength: 50
+          description: Short description of the transaction (max 50 characters)
+        transaction_date:
+          type: string
+          format: date
+          description: Date of the transaction in YYYY-MM-DD format
+        purchase_amount:
+          type: number
+          format: float
+          minimum: 0.01
+          description: Transaction amount rounded to the nearest cent
+
+    Transaction:
+      type: object
+      required:
+        - id
+        - description
+        - transaction_date
+        - purchase_amount
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the transaction
+        description:
+          type: string
+          maxLength: 50
+          description: Short description of the transaction
+        transaction_date:
+          type: string
+          format: date
+          description: Date of the transaction in YYYY-MM-DD format
+        purchase_amount:
+          type: number
+          format: float
+          minimum: 0.01
+          description: Transaction amount rounded to the nearest cent
+
+    ConvertedTransaction:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the transaction
+        description:
+          type: string
+          maxLength: 50
+          description: Short description of the transaction
+        transaction_date:
+          type: string
+          format: date
+          description: Date of the transaction
+        purchase_amount:
+          type: number
+          format: float
+          description: Original purchase amount in USD
+        exchange_rate:
+          type: number
+          format: float
+          description: Exchange rate used for conversion
+        converted_amount:
+          type: number
+          format: float
+          description: Converted amount in the target currency rounded to two decimal places
+        currency:
+          type: string
+          description: Currency code of the converted amount
