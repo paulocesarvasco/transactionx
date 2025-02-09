@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 	"transactionx/internal/database"
 	"transactionx/internal/resources"
 	"transactionx/internal/service"
@@ -34,7 +33,7 @@ func TestRegisterTransaction(t *testing.T) {
 		transaction  resources.Transaction
 		expectedCode int
 	}{
-		{"valid transaction", resources.Transaction{Description: "foo transaction", Date: time.Now().Format(time.RFC3339), PurchaseAmount: 100.00}, http.StatusCreated},
+		{"valid transaction", resources.Transaction{Description: "foo transaction", Date: "2025-02-10 15:00:00", PurchaseAmount: 100.00}, http.StatusCreated},
 		{"invalid time format", resources.Transaction{Description: "foo transaction", Date: "2025-02-02", PurchaseAmount: 100.00}, http.StatusBadRequest},
 		{"invalid amount", resources.Transaction{Description: "foo transaction", Date: "2025-02-02T12:00:00", PurchaseAmount: -100.00}, http.StatusBadRequest},
 	}

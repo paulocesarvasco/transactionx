@@ -25,7 +25,7 @@ func (s *service) RegisterTransaction(t resources.Transaction) (resources.Transa
 	if len(t.Description) > constants.MAX_DESCRIPTION_LEN {
 		return resources.Transaction{}, constants.ErrorInvliadDescriptionLenght
 	}
-	if _, err := time.Parse(time.RFC3339, t.Date); err != nil {
+	if _, err := time.Parse("2006-01-02 15:04:05", t.Date); err != nil {
 		return resources.Transaction{}, constants.ErrorInvliadTimeFormat
 	}
 	if t.PurchaseAmount <= 0 {
