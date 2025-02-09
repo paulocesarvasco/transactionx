@@ -1,0 +1,50 @@
+package database
+
+import (
+	"log"
+	"transactionx/internal/resources"
+
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
+
+type Client interface {
+	RegisterTransaction(t resources.Transaction) (resources.Transaction, error)
+}
+
+type dbClient struct {
+	db *gorm.DB
+}
+
+func NewSQLiteClient() Client {
+	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("Failed to connect to test database: %v", err)
+	}
+
+	db.AutoMigrate(&resources.Transaction{})
+
+	return &dbClient{db: db}
+}
+
+func (c dbClient) RegisterTransaction(t resources.Transaction) (resources.Transaction, error) {
+	tx := c.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	if tx.Error != nil {
+		return resources.Transaction{}, tx.Error
+	}
+
+	if err := tx.Create(&t).Error; err != nil {
+		tx.Rollback()
+		return resources.Transaction{}, err
+	}
+	err := tx.Commit().Error
+	if err != nil {
+		return resources.Transaction{}, err
+	}
+	return t, nil
+}
