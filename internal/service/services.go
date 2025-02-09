@@ -2,6 +2,7 @@ package service
 
 import (
 	"time"
+	"transactionx/internal/constants"
 	"transactionx/internal/database"
 	"transactionx/internal/resources"
 )
@@ -21,14 +22,14 @@ func NewService(db database.Client) Services {
 }
 
 func (s *service) RegisterTransaction(t resources.Transaction) (resources.Transaction, error) {
-	if len(t.Description) > 50 {
-		return resources.Transaction{}, nil
+	if len(t.Description) > constants.MAX_DESCRIPTION_LEN {
+		return resources.Transaction{}, constants.ErrorInvliadDescriptionLenght
 	}
 	if _, err := time.Parse(time.RFC3339, t.Date); err != nil {
-		return resources.Transaction{}, nil
+		return resources.Transaction{}, constants.ErrorInvliadTimeFormat
 	}
-	if t.PruchaseAmount <= 0 {
-		return resources.Transaction{}, nil
+	if t.PurchaseAmount <= 0 {
+		return resources.Transaction{}, constants.ErrorTransactionPurchaseAmount
 	}
 	return s.db.RegisterTransaction(t)
 }
