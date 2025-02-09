@@ -1,10 +1,10 @@
 package resources
 
 type Transaction struct {
-	ID             string  `json:"id"`
+	ID             string  `json:"id" gorm:"type:uuid;primaryKey"`
 	Description    string  `json:"description"`
 	Date           string  `json:"transaction_date"`
-	PruchaseAmount float64 `json:"purchase_amount"`
+	PurchaseAmount float64 `json:"purchase_amount"`
 }
 
 type ConvertedTransaction struct {
@@ -12,4 +12,9 @@ type ConvertedTransaction struct {
 	ExchangeRate    float64 `json:"exchange_rate"`
 	ConvertedAmount float64 `json:"converted_amount"`
 	Currency        string  `json:"currency"`
+}
+
+type Error struct {
+	ResponseCode int    `json:"response_code"`
+	Message      string `json:"message"`
 }

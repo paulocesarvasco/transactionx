@@ -6,8 +6,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"transactionx/internal/database"
 	"transactionx/internal/handler"
 	"transactionx/internal/router"
+	"transactionx/internal/service"
 )
 
 func main() {
@@ -20,7 +22,9 @@ func main() {
 		os.Exit(0)
 	}(c)
 
-	r := router.InstanceRoutes(handler.NewHandler())
+	db := database.NewSQLiteClient()
+	service := service.NewService(db)
+	r := router.InstanceRoutes(handler.NewHandler(service))
 
 	log.Println("Server started on :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
