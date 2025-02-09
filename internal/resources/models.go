@@ -13,3 +13,8 @@ type ConvertedTransaction struct {
 	ConvertedAmount float64 `json:"converted_amount"`
 	Currency        string  `json:"currency"`
 }
+
+type Error struct {
+	ResponseCode int    `json:"response_code"`
+	Message      string `json:"message"`
+}
