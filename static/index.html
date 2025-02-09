@@ -90,10 +90,14 @@
                 });
 
                 const result = await response.json();
-                alert(result.message);
+                showPopup(`Transaction Registered: ${JSON.stringify(result)}`);
             } catch (error) {
-                alert('Error submitting transaction: ' + error.message);
+                showPopup(`Error submitting transaction: ${error.message}`);
             }
+        }
+
+        function showPopup(message) {
+            alert(message);
         }
     </script>
 </head>
