@@ -18,3 +18,13 @@ type Error struct {
 	ResponseCode int    `json:"response_code"`
 	Message      string `json:"message"`
 }
+
+type ExchangeAPIPayload struct {
+	Data []CountryMetadata `json:"data"`
+}
+type CountryMetadata struct {
+	RecordDate   string `json:"record_date"`
+	Country      string `json:"country"`
+	Currency     string `json:"currency"`
+	ExchangeRate string `json:"exchange_rate"`
+}
