@@ -1,9 +1,14 @@
 package service
 
 import (
+	"context"
+	"log"
+	"math"
+	"strconv"
 	"time"
 	"transactionx/internal/constants"
 	"transactionx/internal/database"
+	"transactionx/internal/exchange"
 	"transactionx/internal/resources"
 
 	"github.com/google/uuid"
@@ -12,15 +17,18 @@ import (
 type Services interface {
 	RegisterTransaction(t resources.Transaction) (resources.Transaction, error)
 	ListTransactions() ([]resources.Transaction, error)
+	ConvertTransaction(ctx context.Context, transactionID string, country string) (resources.ConvertedTransaction, error)
 }
 
 type service struct {
-	db database.Client
+	db       database.Client
+	exchange exchange.Service
 }
 
-func NewService(db database.Client) Services {
+func NewService(db database.Client, conversor exchange.Service) Services {
 	return &service{
-		db: db,
+		db:       db,
+		exchange: conversor,
 	}
 }
 
@@ -40,4 +48,23 @@ func (s *service) RegisterTransaction(t resources.Transaction) (resources.Transa
 
 func (s *service) ListTransactions() ([]resources.Transaction, error) {
 	return s.db.RetrieveTransactions()
+}
+
+func (s *service) ConvertTransaction(ctx context.Context, transactionID string, country string) (resources.ConvertedTransaction, error) {
+	t, err := s.db.SearchTransaction(transactionID)
+	if err != nil {
+		return resources.ConvertedTransaction{}, err
+	}
+	cd, err := s.exchange.CountryData(ctx, country)
+	if err != nil {
+		return resources.ConvertedTransaction{}, err
+	}
+	var ct resources.ConvertedTransaction
+	ct.Transaction = t
+	ct.Currency = cd.Currency
+	rate, _ := strconv.ParseFloat(cd.ExchangeRate, 64)
+	rate = math.Round(rate*100) / 100
+	ct.ExchangeRate = rate
+	ct.ConvertedAmount = math.Round(rate*t.PurchaseAmount*100) / 100
+	return ct, nil
 }

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"log"
 	"transactionx/internal/resources"
 
@@ -11,6 +12,7 @@ import (
 type Client interface {
 	RegisterTransaction(t resources.Transaction) (resources.Transaction, error)
 	RetrieveTransactions() ([]resources.Transaction, error)
+	SearchTransaction(id string) (resources.Transaction, error)
 }
 
 type dbClient struct {
@@ -57,4 +59,17 @@ func (c dbClient) RetrieveTransactions() ([]resources.Transaction, error) {
 		return nil, result.Error
 	}
 	return t, nil
+}
+
+func (c dbClient) SearchTransaction(id string) (resources.Transaction, error) {
+	var t resources.Transaction
+	result := c.db.Where("id = ?", id).First(&t)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return resources.Transaction{}, nil
+	}
+	if result.Error != nil {
+		return resources.Transaction{}, result.Error
+	}
+	return t, nil
+
 }
