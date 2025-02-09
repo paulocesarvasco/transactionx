@@ -5,6 +5,8 @@ import (
 	"transactionx/internal/constants"
 	"transactionx/internal/database"
 	"transactionx/internal/resources"
+
+	"github.com/google/uuid"
 )
 
 type Services interface {
@@ -32,6 +34,7 @@ func (s *service) RegisterTransaction(t resources.Transaction) (resources.Transa
 	if t.PurchaseAmount <= 0 {
 		return resources.Transaction{}, constants.ErrorTransactionPurchaseAmount
 	}
+	t.ID = uuid.New().String()
 	return s.db.RegisterTransaction(t)
 }
 

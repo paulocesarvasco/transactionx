@@ -1,7 +1,7 @@
 package resources
 
 type Transaction struct {
-	ID             int     `json:"id,omitempty" gorm:"primaryKey;autoIncrement"`
+	ID             string  `json:"id" gorm:"type:uuid;primaryKey"`
 	Description    string  `json:"description"`
 	Date           string  `json:"transaction_date"`
 	PurchaseAmount float64 `json:"purchase_amount"`
