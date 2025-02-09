@@ -1,6 +1,7 @@
 package router
 
 import (
+	"net/http"
 	"transactionx/internal/handler"
 
 	"github.com/gorilla/mux"
@@ -8,7 +9,9 @@ import (
 
 func InstanceRoutes(h handler.Handler) *mux.Router {
 	router := mux.NewRouter()
-	router.HandleFunc("/", h.HomePage()).Methods("GET")
+	router.HandleFunc("/", h.HomePage()).Methods(http.MethodGet)
+	router.HandleFunc("/index", h.FrontPage()).Methods(http.MethodGet)
+	router.HandleFunc("/transactions", h.RegisterTransaction()).Methods(http.MethodPost)
 
 	return router
 }

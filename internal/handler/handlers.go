@@ -9,6 +9,7 @@ import (
 
 type Handler interface {
 	HomePage() http.HandlerFunc
+	FrontPage() http.HandlerFunc
 	RegisterTransaction() http.HandlerFunc
 }
 
@@ -25,6 +26,12 @@ type handler struct {
 func (h *handler) HomePage() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"message": "Welcome to transactionX API!"})
+	}
+}
+
+func (h *handler) FrontPage() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/index.html")
 	}
 }
 
