@@ -46,3 +46,17 @@ func TestRegisterTransaction(t *testing.T) {
 		assert.Equal(t, tc.expectedCode, rr.Code, tc.name)
 	}
 }
+
+func TestFetchTransactionsList(t *testing.T) {
+	rawBody, _ := json.Marshal(resources.Transaction{Description: "foo transaction", Date: "2025-02-10 15:00:00", PurchaseAmount: 100.00})
+	req, _ := http.NewRequest(http.MethodPost, "http://127.0.0.1/transactions", bytes.NewReader(rawBody))
+	rr := httptest.NewRecorder()
+
+	h := NewHandler(service.NewService(database.NewSQLiteClient()))
+	h.RegisterTransaction().ServeHTTP(rr, req)
+
+	req, _ = http.NewRequest(http.MethodGet, "http://127.0.0.1/transactions", nil)
+	rr = httptest.NewRecorder()
+	h.ListTransactions().ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code, "fetch list")
+}
