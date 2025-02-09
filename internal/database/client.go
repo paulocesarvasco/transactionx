@@ -10,6 +10,7 @@ import (
 
 type Client interface {
 	RegisterTransaction(t resources.Transaction) (resources.Transaction, error)
+	RetrieveTransactions() ([]resources.Transaction, error)
 }
 
 type dbClient struct {
@@ -27,7 +28,7 @@ func NewSQLiteClient() Client {
 	return &dbClient{db: db}
 }
 
-func (c dbClient) RegisterTransaction(t resources.Transaction) (resources.Transaction, error) {
+func (c *dbClient) RegisterTransaction(t resources.Transaction) (resources.Transaction, error) {
 	tx := c.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -45,6 +46,15 @@ func (c dbClient) RegisterTransaction(t resources.Transaction) (resources.Transa
 	err := tx.Commit().Error
 	if err != nil {
 		return resources.Transaction{}, err
+	}
+	return t, nil
+}
+
+func (c dbClient) RetrieveTransactions() ([]resources.Transaction, error) {
+	var t []resources.Transaction
+	result := c.db.Find(&t)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 	return t, nil
 }

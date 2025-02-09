@@ -9,6 +9,7 @@ import (
 
 type Services interface {
 	RegisterTransaction(t resources.Transaction) (resources.Transaction, error)
+	ListTransactions() ([]resources.Transaction, error)
 }
 
 type service struct {
@@ -32,4 +33,8 @@ func (s *service) RegisterTransaction(t resources.Transaction) (resources.Transa
 		return resources.Transaction{}, constants.ErrorTransactionPurchaseAmount
 	}
 	return s.db.RegisterTransaction(t)
+}
+
+func (s *service) ListTransactions() ([]resources.Transaction, error) {
+	return s.db.RetrieveTransactions()
 }

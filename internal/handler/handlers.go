@@ -11,6 +11,7 @@ type Handler interface {
 	HomePage() http.HandlerFunc
 	FrontPage() http.HandlerFunc
 	RegisterTransaction() http.HandlerFunc
+	ListTransactions() http.HandlerFunc
 }
 
 func NewHandler(s service.Services) Handler {
@@ -54,5 +55,18 @@ func (h *handler) RegisterTransaction() http.HandlerFunc {
 		}
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(t)
+	}
+}
+
+func (h *handler) ListTransactions() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		list, err := h.s.ListTransactions()
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(resources.Error{ResponseCode: http.StatusBadRequest, Message: err.Error()})
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(list)
 	}
 }
