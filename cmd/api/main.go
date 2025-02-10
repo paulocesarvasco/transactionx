@@ -6,7 +6,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"transactionx/internal/constants"
 	"transactionx/internal/database"
+	"transactionx/internal/exchange"
 	"transactionx/internal/handler"
 	"transactionx/internal/router"
 	"transactionx/internal/service"
@@ -23,9 +25,10 @@ func main() {
 	}(c)
 
 	db := database.NewSQLiteClient()
-	service := service.NewService(db)
+	exchangeService := exchange.NewService(&http.Client{}, constants.TREASURY_API_URL)
+	service := service.NewService(db, exchangeService)
 	r := router.InstanceRoutes(handler.NewHandler(service))
 
 	log.Println("Server started on :8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe("127.0.0.1:8080", r))
 }
