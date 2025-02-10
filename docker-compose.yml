@@ -1,0 +1,39 @@
+networks:
+  transactions-network:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    container_name: transactions-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: transactions_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - transactions-network
+
+  api:
+    build: .
+    container_name: transaction_x
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DB_HOST: transactions-db
+      DB_USER: admin
+      DB_PASSWORD: secret
+      DB_NAME: transactions_db
+      DB_PORT: 5432
+    ports:
+      - "8080:8080"
+    networks:
+      - transactions-network
+
+volumes:
+  pgdata:

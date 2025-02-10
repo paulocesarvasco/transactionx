@@ -2,10 +2,13 @@ package database
 
 import (
 	"errors"
+	"fmt"
 	"log"
+	"os"
 	"transactionx/internal/constants"
 	"transactionx/internal/resources"
 
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -18,6 +21,28 @@ type Client interface {
 
 type dbClient struct {
 	db *gorm.DB
+}
+
+func NewPostgresClient() Client {
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"),
+	)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	err = db.AutoMigrate(&resources.Transaction{})
+	if err != nil {
+		log.Fatalf("Migration failed: %v", err)
+	}
+	log.Println("Migration completed successfully!")
+
+	return &dbClient{db: db}
+
 }
 
 func NewSQLiteClient() Client {

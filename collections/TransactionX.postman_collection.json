@@ -1,0 +1,92 @@
+{
+	"info": {
+		"_postman_id": "f21c4b3c-7b8c-4ef9-a875-f2ee5a40ac44",
+		"name": "TransactionX",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38402617"
+	},
+	"item": [
+		{
+			"name": "List transactions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8080/transactions",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Convert transaction",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8080/convert/4a3b2d21-aa23-463e-abbc-cea63dfe6636?country=Brazil",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"convert",
+						"4a3b2d21-aa23-463e-abbc-cea63dfe6636"
+					],
+					"query": [
+						{
+							"key": "country",
+							"value": "Brazil"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register transaction",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"description test\",\n    \"transaction_date\": \"2025-02-10 15:00:00\",\n    \"purchase_amount\": 9.34\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/transactions",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

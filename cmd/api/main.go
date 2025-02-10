@@ -24,11 +24,11 @@ func main() {
 		os.Exit(0)
 	}(c)
 
-	db := database.NewSQLiteClient()
+	db := database.NewPostgresClient()
 	exchangeService := exchange.NewService(&http.Client{}, constants.TREASURY_API_URL)
 	service := service.NewService(db, exchangeService)
 	r := router.InstanceRoutes(handler.NewHandler(service))
 
 	log.Println("Server started on :8080")
-	log.Fatal(http.ListenAndServe("127.0.0.1:8080", r))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", r))
 }
