@@ -89,7 +89,6 @@ func (h *handler) ConvertTransaction() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		transactionID := vars["id"]
-
 		country := r.URL.Query().Get("country")
 
 		w.Header().Set("Content-Type", "application/json")
