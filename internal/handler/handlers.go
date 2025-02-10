@@ -2,7 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+	"transactionx/internal/constants"
 	"transactionx/internal/resources"
 	"transactionx/internal/service"
 
@@ -43,6 +45,7 @@ func (h *handler) RegisterTransaction() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var requestPayload resources.Transaction
 		defer r.Body.Close()
+		w.Header().Set("Content-Type", "application/json")
 		err := json.NewDecoder(r.Body).Decode(&requestPayload)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -50,11 +53,17 @@ func (h *handler) RegisterTransaction() http.HandlerFunc {
 			return
 		}
 		t, err := h.s.RegisterTransaction(requestPayload)
-		if err != nil {
+		if err != nil &&
+			(errors.Is(err, constants.ErrorInvliadDescriptionLenght) ||
+				errors.Is(err, constants.ErrorInvliadTimeFormat) ||
+				errors.Is(err, constants.ErrorTransactionPurchaseAmount)) {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(resources.Error{ResponseCode: http.StatusBadRequest, Message: err.Error()})
 			return
-
+		} else if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(resources.Error{ResponseCode: http.StatusInternalServerError, Message: err.Error()})
+			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
@@ -64,13 +73,13 @@ func (h *handler) RegisterTransaction() http.HandlerFunc {
 
 func (h *handler) ListTransactions() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		list, err := h.s.ListTransactions()
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(resources.Error{ResponseCode: http.StatusBadRequest, Message: err.Error()})
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(resources.Error{ResponseCode: http.StatusInternalServerError, Message: err.Error()})
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(list)
 	}
@@ -83,13 +92,20 @@ func (h *handler) ConvertTransaction() http.HandlerFunc {
 
 		country := r.URL.Query().Get("country")
 
+		w.Header().Set("Content-Type", "application/json")
+
 		ct, err := h.s.ConvertTransaction(r.Context(), transactionID, country)
-		if err != nil {
+		if err != nil &&
+			(errors.Is(err, constants.ErrorTransactionNotFound) ||
+				errors.Is(err, constants.ErrorExchangeRequestWithoutResults)) {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(resources.Error{ResponseCode: http.StatusNotFound, Message: err.Error()})
+			return
+		} else if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(resources.Error{ResponseCode: http.StatusInternalServerError, Message: err.Error()})
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(ct)
 	}

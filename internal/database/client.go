@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"log"
+	"transactionx/internal/constants"
 	"transactionx/internal/resources"
 
 	"gorm.io/driver/sqlite"
@@ -65,7 +66,7 @@ func (c dbClient) SearchTransaction(id string) (resources.Transaction, error) {
 	var t resources.Transaction
 	result := c.db.Where("id = ?", id).First(&t)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return resources.Transaction{}, nil
+		return resources.Transaction{}, constants.ErrorTransactionNotFound
 	}
 	if result.Error != nil {
 		return resources.Transaction{}, result.Error

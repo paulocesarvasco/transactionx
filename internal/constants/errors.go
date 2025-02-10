@@ -2,9 +2,11 @@ package constants
 
 import "fmt"
 
+// Transaction errors
 var ErrorInvliadDescriptionLenght = fmt.Errorf("invalid length for given description")
 var ErrorInvliadTimeFormat = fmt.Errorf("transaction with invalid time format")
 var ErrorTransactionPurchaseAmount = fmt.Errorf("transaction with invalid purchase amount")
+var ErrorTransactionNotFound = fmt.Errorf("transaction not found for given ID")
 
 // Exchange errors
 var ErrorExchangeCreateRequest = fmt.Errorf("failed to create request for treasury API")
