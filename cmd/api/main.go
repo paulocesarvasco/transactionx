@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"transactionx/internal/constants"
 	"transactionx/internal/database"
 	"transactionx/internal/exchange"
 	"transactionx/internal/handler"
@@ -24,7 +25,7 @@ func main() {
 	}(c)
 
 	db := database.NewSQLiteClient()
-	exchangeService := exchange.NewService()
+	exchangeService := exchange.NewService(&http.Client{}, constants.TREASURY_API_URL)
 	service := service.NewService(db, exchangeService)
 	r := router.InstanceRoutes(handler.NewHandler(service))
 

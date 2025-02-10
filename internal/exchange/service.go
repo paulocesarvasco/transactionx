@@ -11,25 +11,25 @@ import (
 	"transactionx/internal/resources"
 )
 
-const BASE_URL string = "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?fields=record_date,country,currency,exchange_rate&filter=record_date:gt:%s,country:eq:%s"
-
 type service struct {
-	c *http.Client
+	c          *http.Client
+	apiAddress string
 }
 
 type Service interface {
 	CountryData(ctx context.Context, country string) (resources.CountryMetadata, error)
 }
 
-func NewService() Service {
+func NewService(c *http.Client, apiAddress string) Service {
 	return &service{
-		c: &http.Client{},
+		c:          c,
+		apiAddress: apiAddress,
 	}
 }
 
 func (s *service) CountryData(ctx context.Context, country string) (resources.CountryMetadata, error) {
 	startTime := time.Now().AddDate(0, -6, 0).Format("2006-01-02")
-	finalURL := fmt.Sprintf(BASE_URL, startTime, country)
+	finalURL := fmt.Sprintf(s.apiAddress, startTime, country)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, finalURL, nil)
 	if err != nil {
 		log.Println("ERROR: ", err)
