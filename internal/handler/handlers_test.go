@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"transactionx/internal/constants"
 	"transactionx/internal/database"
+	"transactionx/internal/exchange"
 	"transactionx/internal/resources"
 	"transactionx/internal/service"
 
@@ -16,7 +18,8 @@ import (
 func TestHomePage(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1/", nil)
 	rr := httptest.NewRecorder()
-	h := NewHandler(service.NewService(database.NewSQLiteClient()))
+	exchangeService := exchange.NewService(&http.Client{}, constants.TREASURY_API_URL)
+	h := NewHandler(service.NewService(database.NewSQLiteClient(), exchangeService))
 	h.HomePage().ServeHTTP(rr, req)
 
 	type response struct {
@@ -41,7 +44,8 @@ func TestRegisterTransaction(t *testing.T) {
 		rawBody, _ := json.Marshal(tc.transaction)
 		req, _ := http.NewRequest(http.MethodPost, "http://1270.0.0.1/transaction", bytes.NewReader(rawBody))
 		rr := httptest.NewRecorder()
-		h := NewHandler(service.NewService(database.NewSQLiteClient()))
+		exchangeService := exchange.NewService(&http.Client{}, constants.TREASURY_API_URL)
+		h := NewHandler(service.NewService(database.NewSQLiteClient(), exchangeService))
 		h.RegisterTransaction().ServeHTTP(rr, req)
 		assert.Equal(t, tc.expectedCode, rr.Code, tc.name)
 	}
@@ -52,7 +56,8 @@ func TestFetchTransactionsList(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "http://127.0.0.1/transactions", bytes.NewReader(rawBody))
 	rr := httptest.NewRecorder()
 
-	h := NewHandler(service.NewService(database.NewSQLiteClient()))
+	exchangeService := exchange.NewService(&http.Client{}, constants.TREASURY_API_URL)
+	h := NewHandler(service.NewService(database.NewSQLiteClient(), exchangeService))
 	h.RegisterTransaction().ServeHTTP(rr, req)
 
 	req, _ = http.NewRequest(http.MethodGet, "http://127.0.0.1/transactions", nil)
