@@ -2,6 +2,7 @@ package exchange
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -21,6 +22,12 @@ type Service interface {
 }
 
 func NewService(c *http.Client, apiAddress string) Service {
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	c.Transport = transport
 	return &service{
 		c:          c,
 		apiAddress: apiAddress,
