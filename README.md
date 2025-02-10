@@ -51,4 +51,4 @@ A **CI pipeline** was implemented to enforce the branch model, build the project
 
 The project can be accessed here:
 
-    https://github.com/users/paulocesarvasco/projects/1/views/1
+    https://github.com/users/paulocesarvasco/projects/2
