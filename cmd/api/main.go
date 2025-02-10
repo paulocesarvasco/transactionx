@@ -30,5 +30,5 @@ func main() {
 	r := router.InstanceRoutes(handler.NewHandler(service))
 
 	log.Println("Server started on :8080")
-	log.Fatal(http.ListenAndServe("127.0.0.1:8080", r))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", r))
 }
