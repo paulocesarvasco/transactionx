@@ -24,7 +24,7 @@ func main() {
 		os.Exit(0)
 	}(c)
 
-	db := database.NewSQLiteClient()
+	db := database.NewPostgresClient()
 	exchangeService := exchange.NewService(&http.Client{}, constants.TREASURY_API_URL)
 	service := service.NewService(db, exchangeService)
 	r := router.InstanceRoutes(handler.NewHandler(service))
