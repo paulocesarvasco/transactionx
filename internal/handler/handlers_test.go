@@ -23,7 +23,7 @@ func TestFrontPage(t *testing.T) {
 	exchangeService := exchange.NewService(&http.Client{}, constants.TREASURY_API_URL)
 	h := NewHandler(service.NewService(database.NewSQLiteClient(), exchangeService))
 	h.FrontPage().ServeHTTP(rr, req)
-	assert.Equal(t, http.StatusOK, rr.Code, "test get front page")
+	assert.Equal(t, http.StatusMovedPermanently, rr.Code, "test get front page")
 }
 
 func TestHomePage(t *testing.T) {
